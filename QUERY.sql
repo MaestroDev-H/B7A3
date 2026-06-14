@@ -32,33 +32,41 @@ CREATE TABLE Users (
 -- 2. CREATE MATCHES TABLE
 -- =========================================================================
 CREATE TABLE Matches (
-    match_id TYPE,
-    fixture TYPE,
-    tournament_category TYPE,
-    base_ticket_price TYPE,
-    match_status TYPE,
+    match_id INT,
+    fixture VARCHAR(150) NOT NULL,
+    tournament_category VARCHAR(100) NOT NULL,
+    base_ticket_price DECIMAL(10, 2) NOT NULL,
+    match_status VARCHAR(50) NOT NULL,
     
     -- Write your constraint to make 'match_id' the Primary Key
+    CONSTRAINT pk_matches PRIMARY KEY (match_id),
     -- Write your check constraint to prevent negative ticket prices
+    CONSTRAINT check_positive_price CHECK (base_ticket_price >= 0),
     -- Write your check constraint to restrict 'match_status' values
+    CONSTRAINT check_match_status CHECK (match_status IN ('Available', 'Selling Fast', 'Sold Out', 'Postponed'))
 );
 
 -- =========================================================================
 -- 3. CREATE BOOKINGS TABLE
 -- =========================================================================
 CREATE TABLE Bookings (
-    booking_id TYPE,
-    user_id TYPE,
-    match_id TYPE,
-    seat_number TYPE,
-    payment_status TYPE,
-    total_cost TYPE,
+    booking_id INT,
+    user_id INT,
+    match_id INT,
+    seat_number VARCHAR(20),
+    payment_status VARCHAR(50),
+    total_cost DECIMAL(10, 2) NOT NULL,
     
     -- Write your constraint to make 'booking_id' the Primary Key
+    CONSTRAINT pk_bookings PRIMARY KEY (booking_id),
     -- Write your Foreign Key constraint linking 'user_id' to the Users table
+    CONSTRAINT fk_bookings_user FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE,
     -- Write your Foreign Key constraint linking 'match_id' to the Matches table
+    CONSTRAINT fk_bookings_match FOREIGN KEY (match_id) REFERENCES Matches(match_id) ON DELETE CASCADE,
     -- Write your check constraint to ensure 'total_cost' is non-negative
+    CONSTRAINT check_positive_total_cost CHECK (total_cost >= 0),
     -- Write your check constraint to restrict 'payment_status' values
+    CONSTRAINT check_payment_status CHECK (payment_status IN ('Pending', 'Confirmed', 'Cancelled', 'Refunded'))
 );
 
 
